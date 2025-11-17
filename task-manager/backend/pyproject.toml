@@ -1,0 +1,22 @@
+[project]
+name = "taskhub"
+version = "1.0.0"
+description = "Advanced task management system with project organization, calendar views, and real-time synchronization"
+requires-python = ">=3.8"
+authors = [
+    {name = "TaskHub Contributors"}
+]
+
+dependencies = [
+    "Flask==2.3.3",
+    "Flask-SQLAlchemy==3.0.5",
+    "Flask-CORS==4.0.0",
+    "python-dateutil==2.8.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]

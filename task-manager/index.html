@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="frontend/styles.css">
+    <style>
+        /* Header with back button */
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .app-header a:hover {
+            opacity: 0.8;
+        }
+
+        .app-header h1 {
+            color: white;
+            margin: 0;
+            flex: 1;
+            font-size: 1.8rem;
+        }
+
+        /* Adjust container for full page */
+        .container {
+            margin-top: 0;
+            min-height: calc(100vh - 60px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation -->
+    <div class="app-header">
+        <a href="../index.html" title="Back to Home">← Home</a>
+        <h1>📋 TaskHub</h1>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="margin: 0;">Tasks</h2>
+            </div>
+
+            <!-- Project List -->
+            <div class="projects-section">
+                <div class="section-header">
+                    <h3 style="margin: 0; font-size: 0.9rem;">Projects</h3>
+                    <button class="btn-add-project" id="btnAddProject" title="Add new project">+</button>
+                </div>
+                <ul class="projects-list" id="projectsList"></ul>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="filters-section">
+                <h3 style="font-size: 0.9rem;">Quick Filters</h3>
+                <button class="filter-btn active" data-filter="all">All Tasks</button>
+                <button class="filter-btn" data-filter="today">Today</button>
+                <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tabs Navigation -->
+            <div class="tabs-navigation">
+                <button class="tab-btn active" data-tab="list-view">📝 List</button>
+                <button class="tab-btn" data-tab="calendar-month">📅 Month</button>
+                <button class="tab-btn" data-tab="calendar-week">📆 Week</button>
+            </div>
+
+            <!-- List View -->
+            <section class="tab-content active" id="list-view">
+                <div class="list-header">
+                    <h2 id="viewTitle">All Tasks</h2>
+                    <div class="list-controls">
+                        <select id="priorityFilter" class="filter-select">
+                            <option value="">All Priorities</option>
+                            <option value="high">High Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                        </select>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <button class="btn-add-task" id="btnAddTask">+ Add Task</button>
+                    </div>
+                </div>
+                <ul class="tasks-list" id="tasksList"></ul>
+            </section>
+
+            <!-- Monthly Calendar View -->
+            <section class="tab-content" id="calendar-month">
+                <div class="calendar-header">
+                    <button id="prevMonth" class="btn-nav">&lt;</button>
+                    <h2 id="monthTitle"></h2>
+                    <button id="nextMonth" class="btn-nav">&gt;</button>
+                </div>
+                <div class="calendar-grid" id="calendarMonth"></div>
+            </section>
+
+            <!-- Weekly Calendar View -->
+            <section class="tab-content" id="calendar-week">
+                <div class="calendar-header">
+                    <button id="prevWeek" class="btn-nav">&lt;</button>
+                    <h2 id="weekTitle"></h2>
+                    <button id="nextWeek" class="btn-nav">&gt;</button>
+                </div>
+                <div class="week-grid" id="calendarWeek"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Add/Edit Project -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="projectModalTitle">New Project</h2>
+                <button class="close" id="closeProjectModal">&times;</button>
+            </div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription">Description</label>
+                    <textarea id="projectDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="projectColor">Color</label>
+                    <div class="color-picker">
+                        <input type="color" id="projectColor" value="#667eea">
+                        <span id="colorPreview"></span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Project</button>
+                    <button type="button" class="btn-secondary" id="deleteProjectBtn" style="display: none;">Delete Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Task -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="taskModalTitle">New Task</h2>
+                <button class="close" id="closeTaskModal">&times;</button>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueDate">Due Date</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="taskReminder">Reminder Date</label>
+                    <input type="date" id="taskReminder">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Task</button>
+                    <button type="button" class="btn-secondary" id="deleteTaskBtn" style="display: none;">Delete Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="statusText">Connecting to backend...</span>
+    </div>
+
+    <script src="frontend/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+- pyrender requires 'numpy<1.20' install ```pip install 'numpy<1.20'```
